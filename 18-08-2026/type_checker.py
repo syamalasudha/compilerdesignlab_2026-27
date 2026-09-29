@@ -1,13 +1,9 @@
-
-
 from SymbolTable import DataType
 from ast_nodes import (
     Const, Var, Assign, Print, BinOp,
     RelOp, Cast, Ternary
 )
 from type_rules import SemanticError, is_numeric, promote
-
-
 
 
 def check_var(node, symbol_table, errors):
@@ -23,7 +19,6 @@ def check_var(node, symbol_table, errors):
         return None
 
     return symbol.getDataType()
-
 
 
 
@@ -46,11 +41,11 @@ def check_assign_stmt(node, symbol_table, errors):
 
     target_type = symbol.getDataType()
 
- 
+
     if target_type == expr_type:
         return target_type
 
-    
+
     if target_type == DataType.DOUBLE and expr_type == DataType.INT:
         node.expr = Cast(
             DataType.DOUBLE,
@@ -59,6 +54,7 @@ def check_assign_stmt(node, symbol_table, errors):
         )
         return target_type
 
+    
     errors.append(
         SemanticError(
             f"cannot assign {expr_type} to {target_type}",
@@ -69,8 +65,6 @@ def check_assign_stmt(node, symbol_table, errors):
     return None
 
 
-
-
 def check_binop(node, symbol_table, errors):
     left_type = check_expr(node.left, symbol_table, errors)
     right_type = check_expr(node.right, symbol_table, errors)
@@ -78,6 +72,7 @@ def check_binop(node, symbol_table, errors):
     if left_type is None or right_type is None:
         return None
 
+    
     if not is_numeric(left_type) or not is_numeric(right_type):
         errors.append(
             SemanticError(
@@ -89,7 +84,6 @@ def check_binop(node, symbol_table, errors):
 
     result_type = promote(left_type, right_type)
 
-  
     if result_type == DataType.DOUBLE:
 
         if left_type == DataType.INT:
@@ -110,6 +104,7 @@ def check_binop(node, symbol_table, errors):
 
 
 
+
 def check_relop(node, symbol_table, errors):
     left_type = check_expr(node.left, symbol_table, errors)
     right_type = check_expr(node.right, symbol_table, errors)
@@ -123,7 +118,7 @@ def check_relop(node, symbol_table, errors):
 
         result_type = promote(left_type, right_type)
 
-  
+        
         if result_type == DataType.DOUBLE:
 
             if left_type == DataType.INT:
@@ -140,7 +135,7 @@ def check_relop(node, symbol_table, errors):
                     node.right.lineno
                 )
 
-     
+    
         return DataType.INT
 
     
@@ -148,7 +143,7 @@ def check_relop(node, symbol_table, errors):
     if left_type == right_type:
         return DataType.INT
 
-   
+
 
     errors.append(
         SemanticError(
@@ -170,19 +165,19 @@ def check_cast(node, symbol_table, errors):
 
     target_type = node.target_type
 
-    
+
     if expr_type == target_type:
         return target_type
 
-   
+    
     if is_numeric(expr_type) and is_numeric(target_type):
         return target_type
 
-  
+    
     if expr_type == DataType.CHAR and target_type == DataType.INT:
         return target_type
 
-  
+
     if expr_type == DataType.INT and target_type == DataType.CHAR:
         return target_type
 
@@ -194,7 +189,6 @@ def check_cast(node, symbol_table, errors):
     )
 
     return None
-
 
 
 
@@ -221,7 +215,7 @@ def check_ternary(node, symbol_table, errors):
     if cond_type is None or then_type is None or else_type is None:
         return None
 
-   
+
 
     if not is_numeric(cond_type):
         errors.append(
@@ -231,12 +225,11 @@ def check_ternary(node, symbol_table, errors):
             )
         )
 
-
+    
 
     if then_type == else_type:
         return then_type
 
-    
 
     if is_numeric(then_type) and is_numeric(else_type):
 
@@ -260,7 +253,6 @@ def check_ternary(node, symbol_table, errors):
 
         return result_type
 
-    
 
     errors.append(
         SemanticError(
@@ -271,8 +263,6 @@ def check_ternary(node, symbol_table, errors):
     )
 
     return None
-
-
 
 
 def check_expr(node, symbol_table, errors):
@@ -319,7 +309,6 @@ def check_expr(node, symbol_table, errors):
 
 
 
-
 def check_stmt(node, symbol_table, errors):
 
     if isinstance(node, Assign):
@@ -337,7 +326,6 @@ def check_stmt(node, symbol_table, errors):
         )
 
     return None
-
 
 
 def check_program(program):
